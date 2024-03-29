@@ -1,0 +1,16 @@
+[package]
+name = "jackbranchdev"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+generation = { path = "../generation" }
+serde = { version = "1.0.197", features = ["derive"] }
+
+[build-dependencies]
+generation = { path = "../generation" }
+gray_matter = "0.2.6"
+markdown = "0.3.0"
+serde = "1.0.197"
