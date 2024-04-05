@@ -1,6 +1,10 @@
 ---
 title: Hello Again, World
+url: hello_world_2
 description: Oxidized my personal site
+date: 04-04-2024
+date_updated: 04-04-2024
+public: true
 ---
 
 # jackbranchdev3

@@ -12,5 +12,6 @@ serde = { version = "1.0.197", features = ["derive"] }
 [build-dependencies]
 generation = { path = "../generation" }
 gray_matter = "0.2.6"
-markdown = "0.3.0"
+markdown = "1.0.0-alpha.16"
 serde = "1.0.197"
+regex = "1.5"
