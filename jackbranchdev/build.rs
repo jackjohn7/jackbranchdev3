@@ -1,9 +1,9 @@
-use std::fs::{self, OpenOptions, File};
+use generation::FrontMatter;
+use gray_matter::engine::YAML;
+use gray_matter::Matter;
+use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
-use gray_matter::Matter;
-use gray_matter::engine::YAML;
-use generation::FrontMatter;
 
 fn main() {
     // generate hashmap and vector of blogposts from
@@ -30,17 +30,23 @@ fn main() {
                         // use gray-matter to get metadata
                         let matter = Matter::<YAML>::new();
 
-                        let front: FrontMatter = matter.parse_with_struct::<FrontMatter>(&content).unwrap().data;
-                        
+                        let front: FrontMatter = matter
+                            .parse_with_struct::<FrontMatter>(&content)
+                            .unwrap()
+                            .data;
+
                         // write metadata to tempfile (proof of concept)
                         let mut file = OpenOptions::new()
                             .write(true) // Allow writing to the file
                             .append(true) // Append mode
                             .open("tmp.data") // Specify the file name or path
                             .expect("Failed to open file");
-                        file.write_fmt(format_args!("title: {}, desc: {}\n", front.title, front.description))
-                            .expect("Failed to write to file");
-                    },
+                        file.write_fmt(format_args!(
+                            "title: {}, desc: {}\n",
+                            front.title, front.description
+                        ))
+                        .expect("Failed to write to file");
+                    }
                     Err(e) => {
                         println!("Error occurred: {}", e);
                     }
@@ -48,7 +54,11 @@ fn main() {
             });
         }
         Err(e) => {
-            panic!("ERROR OPENING PATH: {}, {}", path.canonicalize().unwrap().to_str().unwrap(), e);
+            panic!(
+                "ERROR OPENING PATH: {}, {}",
+                path.canonicalize().unwrap().to_str().unwrap(),
+                e
+            );
         }
     }
 }
