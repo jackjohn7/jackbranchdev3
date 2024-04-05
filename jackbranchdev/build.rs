@@ -1,3 +1,4 @@
+use generation::generator::generate_file_str;
 use generation::{BlogPost, FrontMatter};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
@@ -47,11 +48,9 @@ fn main() {
                         };
                         let html = markdown::to_html_with_options(&raw_html, &opts).unwrap();
 
-                        posts.push(BlogPost {
-                            content,
-                            front_matter,
-                            html,
-                        });
+                        if front_matter.public {
+                            posts.push(BlogPost { front_matter, html });
+                        }
                     }
                     Err(e) => {
                         println!("Error occurred: {}", e);
@@ -68,40 +67,59 @@ fn main() {
         }
     }
 
-    let mut data_file = OpenOptions::new()
-        .write(true) // Allow writing to the file
-        .append(true) // Append mode
-        .open("tmp.data") // Specify the file name or path
-        .expect("Failed to open file");
+    //let mut data_file = OpenOptions::new()
+    //    .write(true) // Allow writing to the file
+    //    .append(true) // Append mode
+    //    .open("tmp.data") // Specify the file name or path
+    //    .expect("Failed to open file");
+    //
+    // Create HTML file if not exist
+    if !PathBuf::from("src/posts.rs").exists() {
+        // create file
+        File::create("src/posts.rs").unwrap();
+    } else {
+        // delete it if it does exist
+        fs::remove_file(PathBuf::from("src/posts.rs")).unwrap();
+        File::create("src/posts.rs").unwrap();
+    }
+    let mut posts_file = OpenOptions::new()
+        .write(true)
+        .append(false)
+        .open("src/posts.rs")
+        .expect("Failed to open posts.rs");
+
+    posts_file
+        .write(generate_file_str(posts).as_bytes())
+        .expect("Failed to write to posts.rs");
 
     // iterate through blogposts and update files
-    for post in posts.iter().filter(|p| p.front_matter.public) {
-        let html_file_str = format!("{}.html", post.front_matter.url);
-        let mut html_path = html_output_dir.clone();
-        html_path.push(PathBuf::from(html_file_str.clone()));
-        // Create HTML file if not exist
-        if !html_path.exists() {
-            // create file
-            File::create(html_path.clone()).unwrap();
-        }
+    //for post in posts.iter().filter(|p| p.front_matter.public) {
+    //let html_file_str = format!("{}.html", post.front_matter.url);
+    //let mut html_path = html_output_dir.clone();
+    //html_path.push(PathBuf::from(html_file_str.clone()));
+    //// Create HTML file if not exist
+    //if !html_path.exists() {
+    //    // create file
+    //    File::create(html_path.clone()).unwrap();
+    //}
 
-        data_file
-            .write_fmt(format_args!(
-                "title: {}, desc: {}\n",
-                post.front_matter.title, post.front_matter.description
-            ))
-            .expect("Failed to write to file");
+    //data_file
+    //    .write_fmt(format_args!(
+    //        "title: {}, desc: {}\n",
+    //        post.front_matter.title, post.front_matter.description
+    //    ))
+    //    .expect("Failed to write to file");
 
-        // write HTML to output (proof of concept)
-        let mut html_file = OpenOptions::new()
-            .write(true) // Allow writing to the file
-            .append(false) // Append mode off to overwrite
-            .open(html_path) // Specify the file name or path
-            .expect(format!("Failed to open file {}", post.front_matter.url).as_str());
-        html_file
-            .write(post.html.as_bytes())
-            .expect("Failed to write to file");
-    }
+    //// write HTML to output (proof of concept)
+    //let mut html_file = OpenOptions::new()
+    //    .write(true) // Allow writing to the file
+    //    .append(false) // Append mode off to overwrite
+    //    .open(html_path) // Specify the file name or path
+    //    .expect(format!("Failed to open file {}", post.front_matter.url).as_str());
+    //html_file
+    //    .write(post.html.as_bytes())
+    //    .expect("Failed to write to file");
+    //}
 }
 
 fn remove_frontmatter(content: &str) -> String {

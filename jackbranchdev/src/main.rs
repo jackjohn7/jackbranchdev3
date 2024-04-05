@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use askama::Template;
 //use axum::routing::post;
 use axum::{extract::Path, response::IntoResponse, routing::get, Router};
@@ -7,10 +9,15 @@ use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod html_template;
+mod posts;
 use crate::html_template::HtmlTemplate;
+use crate::posts::POSTS;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // populate hashmap for blogposts
+    //let post_mapper: HashMap<String, BlogPost> = POSTS.iter().fold(HashMap::new(), |acc, p| {});
+
     // set up tracing for logging with defaults
     tracing_subscriber::registry()
         .with(
