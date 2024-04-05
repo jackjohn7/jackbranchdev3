@@ -1,6 +1,7 @@
 use askama::Template;
 //use axum::routing::post;
-use axum::{response::IntoResponse, routing::get, Router};
+use axum::{extract::Path, response::IntoResponse, routing::get, Router};
+use generation::BlogPost;
 //use tower_http::services::{ServeDir, ServeFile};
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -19,7 +20,9 @@ async fn main() -> anyhow::Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .init();
     println!("Hello, world!");
-    let app = Router::new().route("/", get(index));
+    let app = Router::new()
+        .route("/", get(index))
+        .route("/blog/:file_name", get(blog));
 
     let port = 5173_u16;
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
@@ -44,3 +47,15 @@ async fn index() -> impl IntoResponse {
 #[derive(Template)]
 #[template(path = "index.html")]
 struct IndexTemplate {}
+
+async fn blog(Path(file_name): Path<(String)>) -> impl IntoResponse {
+    debug!("hit blog route!");
+    // In the future, provide the found blog post data to template
+    HtmlTemplate(BlogTemplate { title: file_name })
+}
+
+#[derive(Template)]
+#[template(path = "blog.html")]
+struct BlogTemplate {
+    title: String, //post: BlogPost,
+}
