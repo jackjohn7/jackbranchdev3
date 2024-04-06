@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use askama::Template;
+use axum::extract::State;
 //use axum::routing::post;
 use axum::{extract::Path, response::IntoResponse, routing::get, Router};
 use generation::BlogPostConst;
@@ -13,6 +15,10 @@ mod posts;
 use crate::html_template::HtmlTemplate;
 use crate::posts::POSTS;
 
+struct AppState {
+    posts: HashMap<String, BlogPostConst>,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // populate hashmap for blogposts
@@ -20,6 +26,8 @@ async fn main() -> anyhow::Result<()> {
     for p in POSTS {
         post_mapper.insert(p.metadata.url.to_string(), p.clone());
     }
+
+    let state = AppState { posts: post_mapper };
 
     // set up tracing for logging with defaults
     tracing_subscriber::registry()
@@ -32,7 +40,8 @@ async fn main() -> anyhow::Result<()> {
     println!("Hello, world!");
     let app = Router::new()
         .route("/", get(index))
-        .route("/blog/:file_name", get(blog));
+        .route("/blog/:file_name", get(blog))
+        .with_state(Arc::new(state));
 
     let port = 5173_u16;
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
@@ -58,13 +67,18 @@ async fn index() -> impl IntoResponse {
 #[template(path = "index.html")]
 struct IndexTemplate {}
 
-async fn blog(Path(file_name): Path<String>) -> impl IntoResponse {
-    // TODO: include blogpost mapper in AppState and access it here
-    HtmlTemplate(BlogTemplate { title: file_name })
+async fn blog(
+    State(state): State<Arc<AppState>>,
+    Path(file_name): Path<String>,
+) -> axum::http::Response<axum::body::Body> {
+    match state.posts.get(&file_name) {
+        Some(post) => HtmlTemplate(BlogTemplate { post: post.clone() }).into_response(),
+        None => HtmlTemplate(IndexTemplate {}).into_response(),
+    }
 }
 
 #[derive(Template)]
-#[template(path = "blog.html")]
+#[template(path = "blog.html", ext = "html")]
 struct BlogTemplate {
-    title: String, //post: BlogPost,
+    post: BlogPostConst,
 }
