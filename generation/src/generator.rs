@@ -1,13 +1,5 @@
 use crate::BlogPost;
 
-pub fn generate_file_str(posts: Vec<BlogPost>) -> String {
-    format!(
-        "use crate::{{BlogPost, FrontMatter}};\npub const POSTS: [BlogPost; {}] = {:?};",
-        posts.len(),
-        posts
-    )
-}
-
 fn format_string_value(value: String) -> String {
     format!("\"{}\"", value)
 }

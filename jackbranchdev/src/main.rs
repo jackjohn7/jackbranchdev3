@@ -37,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    println!("Hello, world!");
+
     let app = Router::new()
         .route("/", get(index))
         .route("/blog/:file_name", get(blog))
@@ -59,7 +59,7 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn index() -> impl IntoResponse {
-    debug!("hit index!");
+    debug!("Serving root route");
     HtmlTemplate(IndexTemplate {})
 }
 
@@ -71,6 +71,7 @@ async fn blog(
     State(state): State<Arc<AppState>>,
     Path(file_name): Path<String>,
 ) -> axum::http::Response<axum::body::Body> {
+    debug!("Serving blog route");
     match state.posts.get(&file_name) {
         Some(post) => HtmlTemplate(BlogTemplate { post: post.clone() }).into_response(),
         None => HtmlTemplate(IndexTemplate {}).into_response(),
