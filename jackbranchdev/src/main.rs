@@ -79,7 +79,7 @@ async fn blog(
 }
 
 #[derive(Template)]
-#[template(path = "blog.html", ext = "html")]
+#[template(path = "blog.html")]
 struct BlogTemplate {
     post: BlogPostConst,
 }
