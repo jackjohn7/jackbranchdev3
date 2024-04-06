@@ -55,7 +55,7 @@ async fn index() -> impl IntoResponse {
 #[template(path = "index.html")]
 struct IndexTemplate {}
 
-async fn blog(Path(file_name): Path<(String)>) -> impl IntoResponse {
+async fn blog(Path(file_name): Path<String>) -> impl IntoResponse {
     debug!("hit blog route!");
     // In the future, provide the found blog post data to template
     HtmlTemplate(BlogTemplate { title: file_name })

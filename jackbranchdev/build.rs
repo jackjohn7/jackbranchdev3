@@ -1,4 +1,4 @@
-use generation::generator::generate_file_str;
+use generation::generator::generate;
 use generation::{BlogPost, FrontMatter};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
@@ -89,8 +89,35 @@ fn main() {
         .expect("Failed to open posts.rs");
 
     posts_file
-        .write(generate_file_str(posts).as_bytes())
+        .write(generate(posts.clone()).as_bytes())
         .expect("Failed to write to posts.rs");
+
+    // iterate through posts and create html files
+    for post in posts {
+        let html_path = PathBuf::from(format!(
+            "./public/blog/{}.html",
+            post.front_matter.url.clone()
+        ));
+        // Create HTML file if not exist
+        if !html_path.exists() {
+            // create file
+            File::create(html_path.clone()).unwrap();
+        } else {
+            // delete it if it does exist
+            fs::remove_file(html_path.clone()).unwrap();
+            File::create(html_path.clone()).unwrap();
+        }
+
+        // write HTML to output (proof of concept)
+        let mut html_file = OpenOptions::new()
+            .write(true) // Allow writing to the file
+            .append(false) // Append mode off to overwrite
+            .open(html_path) // Specify the file name or path
+            .expect(format!("Failed to open file {}.html", post.front_matter.url).as_str());
+        html_file
+            .write(post.html.as_bytes())
+            .expect("Failed to write to file");
+    }
 
     // iterate through blogposts and update files
     //for post in posts.iter().filter(|p| p.front_matter.public) {
