@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use askama::Template;
 //use axum::routing::post;
 use axum::{extract::Path, response::IntoResponse, routing::get, Router};
-use generation::BlogPost;
+use generation::BlogPostConst;
 //use tower_http::services::{ServeDir, ServeFile};
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -16,7 +16,10 @@ use crate::posts::POSTS;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // populate hashmap for blogposts
-    //let post_mapper: HashMap<String, BlogPost> = POSTS.iter().fold(HashMap::new(), |acc, p| {});
+    let mut post_mapper: HashMap<String, BlogPostConst> = HashMap::new();
+    for p in POSTS {
+        post_mapper.insert(p.metadata.url.to_string(), p.clone());
+    }
 
     // set up tracing for logging with defaults
     tracing_subscriber::registry()
@@ -56,8 +59,7 @@ async fn index() -> impl IntoResponse {
 struct IndexTemplate {}
 
 async fn blog(Path(file_name): Path<String>) -> impl IntoResponse {
-    debug!("hit blog route!");
-    // In the future, provide the found blog post data to template
+    // TODO: include blogpost mapper in AppState and access it here
     HtmlTemplate(BlogTemplate { title: file_name })
 }
 
