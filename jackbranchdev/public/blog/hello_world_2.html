@@ -1,4 +1,4 @@
-<h1>jackbranchdev3</h1>
+<h1>The Rewrite</h1>
 <h2>Again?</h2>
 <p>I decided to rebuild my site again in what may appear to be an
 annual tradition. Hopefully this will satisfy me for quite a
@@ -7,3 +7,44 @@ style. Jackbranchdev2 wasn't the prettiest site in the world,
 but it looked alright. My goal with this new site is to have
 it look properly good. I want blogposts to reach actual
 readers.</p>
+<p>I wasn't very motivated to work on my previous site and I for
+whatever reason wasn't really enjoying the workflow I had set
+up with Astro. Astro is a great framework, and it deserves the
+attention it's gotten over the past few years, but I'm simply
+not loving it right now. Instead, I'll just stick to plain
+HTML+CSS for my personal site as it needs nothing more than
+that.</p>
+<h1>The Stack</h1>
+<p>The stack for this new revision is quite simple again. It is
+exclusively Rust and Markdown. I'm using Axum+Askama+HTMX to
+render and serve a responsive UI styled with TailwindCSS.</p>
+<h2>How does it work?</h2>
+<p>When I compile the application, the <code>build.rs</code> file runs and
+converts all of my markdown files to structs containing
+metadata and paths to the converted HTML. Using the
+<code>generation</code> library that is a member of this workspace, I
+create a constant value that is accessible to my program at
+runtime. Each of the blogposts include their HTML content with
+the <code>include_str!</code> macro.</p>
+<h3>Code Generation</h3>
+<p><em>Some code here showing the generation</em></p>
+<h3>The Server</h3>
+<p><em>Some code here showing the axum server</em></p>
+<h2>Improvements to make</h2>
+<h3>Static-Site Generation</h3>
+<p>I'd like to simplify the runtime of the application by having
+all of the HTML generated at compile time rather than having
+<em>most</em> of the HTML generated at compile time. Currently, all
+of the HTML for the blogposts are generated at compile time,
+however, they're dynamically placed within the blogpost
+template I've written using Askama templating.</p>
+<pre><code class="language-html">&lt;h2&gt;{{ post.metadata.title }}&lt;/h2&gt;
+{{ post.html|escape(&quot;none&quot;) }}
+</code></pre>
+<p>However, I could execute these askama functions at compile time
+to generate static HTML and remove the need for the
+interpolation at runtime. This should reduce some amount of
+runtime complexity and allow for more flexibility with the
+server. I could for example just generate a folder of HTML
+files and serve that with NGINX or any other HTTP server I
+desire though I'm fine with my Axum server for now.</p>

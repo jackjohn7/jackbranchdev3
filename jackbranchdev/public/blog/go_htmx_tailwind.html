@@ -1,0 +1,47 @@
+<h1>Introduction</h1>
+<p>With the recent improvements to net/http as of the Go 1.22
+update, I was excited to build an application with no
+external dependencies for the web server.</p>
+<p>I wouldn't necessarily recommend this to everyone though.
+Ensuring that errors are properly bubbled up through
+middleware with standard <code>http.HandlerFunc</code> chaining is
+not the simplest thing in the world and I didn't
+particularly enjoy that. Frameworks like
+Echo, Gin, and Chi all make that a
+much better experience since their handlers are built to
+return errors.</p>
+<p>That said, if you're set on sticking to the standard
+library, you can build a very capable web application
+with less boilerplate code than you could in the past.</p>
+<h1>Why Go 1.22?</h1>
+<p>If you're unaware, Go 1.22 provides improvements to route
+handlers since you can now specify what HTTP method the
+route is meant to handle.</p>
+<p>Go 1.21</p>
+<pre><code class="language-go">http.HandleFunc(&quot;/todos&quot;, func (w http.ResponseWriter, r *http.Request) {
+  switch r.Method {
+  case http.MethodGet:
+    // respond with some todos in HTML
+  case http.MethodPost:
+    // respond with the new todo in HTML
+  default:
+    // return MethodNotAllowed
+  }
+})
+</code></pre>
+<p>Go 1.22</p>
+<pre><code class="language-go">http.HandleFunc(&quot;GET /todos&quot;, func (w http.ResponseWriter, r *http.Request) { /* Your GET func */} )
+http.HandleFunc(&quot;POST /todos&quot;, func (w http.ResponseWriter, r *http.Request) { /* Your POST func */} )
+
+// unsupported methods like DELETE, PUT, and PATCH will get MethodNotAllowed error response
+</code></pre>
+<p>The code in Go 1.22 is a lot simpler as I think you'll
+agree.</p>
+<h1>Templates</h1>
+<p>For my project, I chose to use
+Templ,
+but you can absolutely get away with using the standard
+<code>html/template</code> templating library. Both just allow us to
+create dynamic, server-rendered HTML with ease. The
+advantage of Templ is that you get compile-time type-safety
+and a powerful syntax for generating your HTML.</p>

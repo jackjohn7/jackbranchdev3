@@ -73,8 +73,12 @@ async fn blog(
 ) -> axum::http::Response<axum::body::Body> {
     debug!("Serving blog route");
     match state.posts.get(&file_name) {
-        Some(post) => HtmlTemplate(BlogTemplate { post: post.clone() }).into_response(),
-        None => HtmlTemplate(IndexTemplate {}).into_response(),
+        Some(post) => HtmlTemplate(BlogTemplate {
+            post: post.clone(),
+            time_to_read: ((post.html.split(" ").count() as f32 / 238.0).round()) as i16,
+        })
+        .into_response(),
+        None => HtmlTemplate(IndexTemplate {}).into_response(), // 404 later
     }
 }
 
@@ -82,4 +86,5 @@ async fn blog(
 #[template(path = "blog.html")]
 struct BlogTemplate {
     post: BlogPostConst,
+    time_to_read: i16,
 }
