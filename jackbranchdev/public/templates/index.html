@@ -1,1 +1,47 @@
-<h1>Hello, world!</h1>
+{% extends "base.html" %}
+{% block title %}Jack Branch{% endblock %}
+
+{% block head %}
+
+<!-- Use tailwindcss on this page -->
+<link href="/public/styles/twout.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+
+<div
+	class="dark:bg-[#020106] absolute inset-0 h-full w-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:16px_16px] lg:bg-[size:32px_32px]">
+
+
+	<div class="flex lg:flex-row lg:p-4 p-2 lg:space-x-4 flex-col">
+		<img src="https://github.com/jackjohn7.png" class="rounded-2xl lg:rounded-none" />
+
+		<div class="flex flex-col justify-between">
+			<h1 class="text-5xl lg:text-7xl text-white text-center font-inter font-bold">Jack Branch</h1>
+
+			<div class="text-gray-300 flex flex-row space-between space-x-5 px-4">
+				<a href="https://github.com/jackjohn7" target="_blank">GitHub</a>
+				<a href="/blog/hello_world_2" target="_blank">Blog</a>
+				<a href="https://mastodon.social/@jingus" target="_blank">Mastodon</a>
+			</div>
+
+			<p class="text-white text-lg font-inter">
+				I'm a software engineering intern at the Cyber Innovation Center and
+				junior at Louisiana Tech University studying Computer Science. I'm
+				super interested in development of applications, systems, and
+				programming languages. I also enjoy being quite mediocre at video
+				games.
+
+				Welcome to my personal site! Here, I discuss topics related to programming
+				and computer science.
+			</p>
+		</div>
+	</div>
+
+
+</div>
+
+
+{% endblock %}

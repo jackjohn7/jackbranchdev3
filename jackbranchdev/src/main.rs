@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use askama::Template;
@@ -6,6 +7,7 @@ use axum::extract::State;
 //use axum::routing::post;
 use axum::{extract::Path, response::IntoResponse, routing::get, Router};
 use generation::BlogPostConst;
+use tower_http::services::ServeDir;
 //use tower_http::services::{ServeDir, ServeFile};
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -37,10 +39,20 @@ async fn main() -> anyhow::Result<()> {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
+    println!("{}", std::env::current_dir().unwrap().to_str().unwrap());
 
     let app = Router::new()
         .route("/", get(index))
         .route("/blog/:file_name", get(blog))
+        .nest_service(
+            "/public/styles",
+            ServeDir::new(
+                std::env::current_dir()
+                    .unwrap()
+                    .as_path()
+                    .join(PathBuf::from("jackbranchdev/public/styles")),
+            ),
+        )
         .with_state(Arc::new(state));
 
     let port = 5173_u16;
